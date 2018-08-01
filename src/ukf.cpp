@@ -267,12 +267,6 @@ void UKF::Prediction(double delta_t) {
     
     P_ += weights_(i) * x_diff * x_diff.transpose();
   }
-
-  if(meas_package.sensor_type_ == MeasurementPackage::LASER) {
-    UKF::UpdateLidar(meas_package);
-  } else if(meas_package.sensor_type_ == MeasurementPackage::RADAR) {
-    UKF::UpdateRadar(meas_package);
-  }
 }
 
 /**
