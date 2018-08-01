@@ -51,20 +51,12 @@ UKF::UKF() {
   n_aug_ = 7;
   
   is_initialized_ = false;
-  Xsig_pred_ = MatrixXd(7, 15);
-  weights_ = VectorXd(7);
+  Xsig_pred_ = MatrixXd(5, 15);
+  weights_ = VectorXd(15);
 
-  //Process noise covariance matrix
-  MatrixXd Q = MatrixXd(2,2);
-  Q << std_a_*std_a_, 0, 
-        0, std_yawdd_*std_yawdd_;
 
-  //Measurement noise covariance matrix
-  MatrixXd R = MatrixXd(3,3);
 
-  R << std_radr_*std_radr_, 0, 0, 
-        0, std_radphi_*std_radphi_, 0, 
-        0, 0, std_radrd_*std_radrd_;
+
 
   //Augmented variables will be used within the function, hence they are declared locally
 
@@ -90,7 +82,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 
     if(meas_package.sensor_type_ == MeasurementPackage::LASER) {
       x_ << meas_package.raw_measurements_[0], 
-            meas_package.raw_measurements_[0], 
+            meas_package.raw_measurements_[1], 
             0.0, 
             0.0, 
             0.0;
@@ -119,35 +111,32 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 
     cout << "Initialization Complete!!!";
 
+    return;
   }
 
 
-  double delta_t = meas_package.timestamp_ - time_us_;
+  double delta_t = (meas_package.timestamp_ - time_us_) / 1000000.0;
   time_us_ = meas_package.timestamp_;
 
-  UKF::Prediction(delta_t);
+  Prediction(delta_t);
+
+  if (meas_package.sensor_type_ == MeasurementPackage::LASER) {
+    UpdateLidar(meas_package);
+  }
+  else if (meas_package.sensor_type_ == MeasurementPackage::RADAR) {
+    UpdateRadar(meas_package);
+}  
 
 }
 
-/**
- * Predicts sigma points, the state, and the state covariance matrix.
- * @param {double} delta_t the change in time (in seconds) between the last
- * measurement and this one.
- */
+/*
+* This step involves the following
+* 1. Augmentation : Generating augmented sigma points & others : x, P_aug, Xsig_aug
+* 2. Predicting Sigma points from t=k(Xsig_aug) to t=k+1
+* 3. Calculating mean and covariance of this predicted sigma points
+*/
+
 void UKF::Prediction(double delta_t) {
-  /**
-  TODO:
-
-  Complete this function! Estimate the object's location. Modify the state
-  vector, x_. Predict sigma points, the state, and the state covariance matrix.
-  */
-
-  /*
-  * This step involves the following
-  * 1. Augmentation : Generating augmented sigma points & others : x, P_aug, Xsig_aug
-  * 2. Predicting Sigma points from t=k(Xsig_aug) to t=k+1
-  * 3. Calculating mean and covariance of this predicted sigma points
-  */
 
 
   /*****************************STEP 1 : GENERATING SIGMA POINTS****************************/
@@ -160,7 +149,14 @@ void UKF::Prediction(double delta_t) {
   MatrixXd P_aug    = MatrixXd(7,7);
   MatrixXd Xsig_aug = MatrixXd(7, 15);
 
+
   // Augmenting x (state vector with extra noise elements initialized to 0.0 each)
+
+  //Process noise covariance matrix
+  MatrixXd Q = MatrixXd(2,2);
+  Q << std_a_*std_a_, 0, 
+        0, std_yawdd_*std_yawdd_;
+
   x_aug.head(5) = x_;
   x_aug(5) = 0.0;
   x_aug(6) = 0.0;
@@ -318,6 +314,13 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
   
   //measurement covariance matrix S
   MatrixXd S = MatrixXd(n_z,n_z);
+
+  //Measurement noise covariance matrix
+  MatrixXd R = MatrixXd(3,3);
+
+  R << std_radr_*std_radr_, 0, 0, 
+        0, std_radphi_*std_radphi_, 0, 
+        0, 0, std_radrd_*std_radrd_;  
 
   //Zsig is for eventually calculating the predicted covariance in measurement space S
  double px, py, v, psi, vx, vy;
