@@ -134,7 +134,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
  * @param {double} delta_t the change in time (in seconds) between the last
  * measurement and this one.
  */
-void UKF::Prediction(double *delta_t) {
+void UKF::Prediction(double delta_t) {
   /**
   TODO:
 
@@ -362,12 +362,12 @@ for(int i=0; i<2*n_aug_+1; i++) {
    */  
   //Getting actual measurement at time k+1
   VectorXd z = VectorXd(n_z);
-  z << measurement_pack.raw_measurements_[0],
-       measurement_pack.raw_measurements_[1],
-       measurement_pack.raw_measurements_[2];
+  z << meas_package.raw_measurements_[0],
+       meas_package.raw_measurements_[1],
+       meas_package.raw_measurements_[2];
 
 
-  MatrixXd Tc = MatrixXd(n_x, n_z);
+  MatrixXd Tc = MatrixXd(n_x_, n_z);
   Tc.fill(0.0);
   for (int i = 0; i < 2 * n_aug_ + 1; i++) {
 
