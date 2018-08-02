@@ -121,12 +121,10 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
   Prediction(delta_t);
 
   if (meas_package.sensor_type_ == MeasurementPackage::LASER) {
-	cout << "Insider LASER at 124 \n";
     UpdateLidar(meas_package);
   }
   else if (meas_package.sensor_type_ == MeasurementPackage::RADAR) {
     UpdateRadar(meas_package);
-    cout << "Insider RADAR @ 129 \n";
 }  
 
 }
@@ -139,7 +137,6 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 */
 
 void UKF::Prediction(double delta_t) {
-  cout << "Prediction Entered...\n";
 
 
   /*****************************STEP 1 : GENERATING SIGMA POINTS****************************/
@@ -171,7 +168,6 @@ void UKF::Prediction(double delta_t) {
 
   //Caclulating squareroot
   MatrixXd P_sqrt = P_aug.llt().matrixL();
-  cout << "Generating Sigma points start...\n";
   // GENERATING SIGMA POINTS
   Xsig_aug.col(0) = x_aug;
   for(int i=0; i<n_aug_; i++) {
@@ -232,7 +228,6 @@ void UKF::Prediction(double delta_t) {
     Xsig_pred_(4,i) = yawd_p;
   }
 
-  cout << "Sigma Points Prediction Complete!!!\n";
 
 
   /*****************************STEP 3 : CALCULATING MEAN & COVARIANCE OF PREDICTING SIGMA POINTS****************************/
@@ -270,7 +265,6 @@ void UKF::Prediction(double delta_t) {
     
     P_ += weights_(i) * x_diff * x_diff.transpose();
   }
-  cout << "mean & covariance complete at 272 \n";
 }
 
 /**
@@ -278,52 +272,34 @@ void UKF::Prediction(double delta_t) {
  * @param {MeasurementPackage} meas_package
  */
 void UKF::UpdateLidar(MeasurementPackage meas_package) {
-	cout << "281";
-	cout << "In LIDAR XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \n";
-	cout << "283";
   /*****************************STEP 1 : TRANSFORMING PREDITECTED MEAN & COVARIANCE AT TIME k+1 TO MEASUREMENT SPACE****************************/
   /*
    * This step involves transforming the mean x [5] vector & covariance P [5 * 15] 
    * into measurement space with mean z [3] vector & covariance S [3 * 21] matrix
    */  
-	cout << "287";
   int n_z = 2;
-  cout << "289";
 
   //create matrix for sigma points in measurement space
   MatrixXd Zsig = MatrixXd(n_z, 2 * n_aug_ + 1);
-  cout << "291";
   Zsig.fill(0.0);
-  cout << "293";
   //mean predicted measurement
   VectorXd z_mean_pred = VectorXd(n_z);
-  cout << "296";
   z_mean_pred.fill(0.0);
-  cout << "298";
   //measurement covariance matrix S
   MatrixXd S = MatrixXd(n_z,n_z);
-  cout << "300";
   S.fill(0.0);
-  cout << "303";
 
   //Measurement noise covariance matrix
   MatrixXd R = MatrixXd(2,2);
   R << std_laspx_*std_laspx_, 0,
         0, std_laspy_*std_laspy_;
-  cout << "Zsig, Z_mean_pred S, R initiazed in lidar\n";
-  cout << "Xsig_Pred_ :: " << Xsig_pred_ << "\n";
   //Zsig is for eventually calculating the predicted covariance in measurement space S
  for(int i=0; i<2*n_aug_+1; i++) {
-	 cout << "Inside loop with value i=" << i << "\n";
-	 cout << "Sig Pred px at column " << i << Xsig_pred_(0, i);
-	 cout << "Sig Pred py at column " << i << Xsig_pred_(0, i);
      Zsig(0, i) = Xsig_pred_(0, i);
      Zsig(1, i) = Xsig_pred_(1, i);
  }
- cout << "Zsig :: " << Zsig << "\n";
 
 
- cout << "Zsig done! \n";
 
 
 //calculate mean predicted measurement
@@ -340,7 +316,6 @@ for(int i=0; i<2*n_aug_+1; i++) {
   }
 
   S = S + R;
-  cout << "S calculated at 333 \n";
 
   /*****************************STEP 2 : UPDATING THE BELIEF****************************/
   /*
@@ -367,7 +342,6 @@ for(int i=0; i<2*n_aug_+1; i++) {
     Tc = Tc + weights_(i) * x_diff * z_diff.transpose();
   }
 
-  cout << "Tc done in LASAR at 360 \n";
 
   //Kalman gain K;
   MatrixXd K = Tc * S.inverse();
@@ -379,7 +353,6 @@ for(int i=0; i<2*n_aug_+1; i++) {
   x_ = x_ + K * z_diff;
   P_ = P_ - K*S*K.transpose();
 
-  cout << "Updated belief for Lidar \n";
 
 }
 
@@ -391,7 +364,6 @@ for(int i=0; i<2*n_aug_+1; i++) {
  * @param {MeasurementPackage} meas_package
  */
 void UKF::UpdateRadar(MeasurementPackage meas_package) {
-	cout << "In RADAR XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \n";
   /**
   * In measurement space, the vecor dimension is 3 as radar provides 3 dimensions only
   * 
@@ -437,7 +409,6 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
      Zsig(2, i) = (px*vx + py*vy) / sqrt(px*px + py*py);
  }
 
-cout << "Zsig done in radar \n";
 //calculate mean predicted measurement
 for(int i=0; i<2*n_aug_+1; i++) {
     z_mean_pred += weights_(i) * Zsig.col(i);
@@ -456,7 +427,6 @@ for(int i=0; i<2*n_aug_+1; i++) {
   }
 
   S = S + R;
-  cout << "S done in radar at 449 \n";
 
   /*****************************STEP 2 : UPDATING THE BELIEF****************************/
   /*
@@ -488,7 +458,6 @@ for(int i=0; i<2*n_aug_+1; i++) {
 
     Tc = Tc + weights_(i) * x_diff * z_diff.transpose();
   }
-  cout << "Tc done in radar \n";
 
   //Kalman gain K;
   MatrixXd K = Tc * S.inverse();
@@ -504,5 +473,4 @@ for(int i=0; i<2*n_aug_+1; i++) {
   x_ = x_ + K * z_diff;
   P_ = P_ - K*S*K.transpose();
 
-  cout << "Belief updated for RADAR!!! \n";
 }
