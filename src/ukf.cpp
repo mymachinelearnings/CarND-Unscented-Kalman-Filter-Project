@@ -307,7 +307,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
   cout << "303";
 
   //Measurement noise covariance matrix
-  MatrixXd R = MatrixXd(3,3);
+  MatrixXd R = MatrixXd(2,2);
   R << std_laspx_*std_laspx_, 0,
         0, std_laspy_*std_laspy_;
   cout << "Zsig, Z_mean_pred S, R initiazed in lidar\n";
