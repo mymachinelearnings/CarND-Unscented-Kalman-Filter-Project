@@ -288,14 +288,19 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
 
   //create matrix for sigma points in measurement space
   MatrixXd Zsig = MatrixXd(n_z, 2 * n_aug_ + 1);
+  cout << "291";
   Zsig.fill(0.0);
-
+  cout << "293";
   //mean predicted measurement
   VectorXd z_mean_pred = VectorXd(n_z);
+  cout << "296";
   z_mean_pred.fill(0.0);
+  cout << "298";
   //measurement covariance matrix S
   MatrixXd S = MatrixXd(n_z,n_z);
+  cout << "300";
   S.fill(0.0);
+  cout << "303";
 
   //Measurement noise covariance matrix
   MatrixXd R = MatrixXd(3,3);
