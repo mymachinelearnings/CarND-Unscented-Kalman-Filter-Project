@@ -238,7 +238,7 @@ void UKF::Prediction(double delta_t) {
    * This involves calculating the weights first
    */
 
-  weights_ = VectorXd(2*n_x_+1);
+  //weights_ = VectorXd(2*n_x_+1); This is already defined
   for(int i=0; i<2*n_aug_+1; i++) {
       double ind_weight = 0.0;
       if(i==0) {
