@@ -302,16 +302,18 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
 
   //create matrix for sigma points in measurement space
   MatrixXd Zsig = MatrixXd(n_z, 2 * n_aug_ + 1);
+  Zsig.fill(0.0);
 
   //mean predicted measurement
   VectorXd z_mean_pred = VectorXd(n_z);
+  z_mean_pred.fill(0.0);
   
   //measurement covariance matrix S
   MatrixXd S = MatrixXd(n_z,n_z);
+  S.fill(0.0);
 
   //Measurement noise covariance matrix
   MatrixXd R = MatrixXd(3,3);
-
   R << std_radr_*std_radr_, 0, 0, 
         0, std_radphi_*std_radphi_, 0, 
         0, 0, std_radrd_*std_radrd_;  
@@ -339,6 +341,7 @@ for(int i=0; i<2*n_aug_+1; i++) {
 }
 
 //calculate covariance matrix S
+
 for(int i=0; i<2*n_aug_+1; i++) {
     VectorXd Z_diff = Zsig.col(i) - z_mean_pred;
     
