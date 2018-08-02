@@ -278,13 +278,17 @@ void UKF::Prediction(double delta_t) {
  * @param {MeasurementPackage} meas_package
  */
 void UKF::UpdateLidar(MeasurementPackage meas_package) {
+	cout << "281";
 	cout << "In LIDAR XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \n";
+	cout << "283";
   /*****************************STEP 1 : TRANSFORMING PREDITECTED MEAN & COVARIANCE AT TIME k+1 TO MEASUREMENT SPACE****************************/
   /*
    * This step involves transforming the mean x [5] vector & covariance P [5 * 15] 
    * into measurement space with mean z [3] vector & covariance S [3 * 21] matrix
    */  
+	cout << "287";
   int n_z = 2;
+  cout << "289";
 
   //create matrix for sigma points in measurement space
   MatrixXd Zsig = MatrixXd(n_z, 2 * n_aug_ + 1);
