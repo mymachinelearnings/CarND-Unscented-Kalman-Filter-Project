@@ -295,7 +295,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
 
   //Measurement noise covariance matrix
   MatrixXd R = MatrixXd(3,3);
-  R << std_radr_*std_radr_, 0 
+  R << std_radr_*std_radr_, 0, 
         0, std_radphi_*std_radphi_;  
 
   //Zsig is for eventually calculating the predicted covariance in measurement space S
