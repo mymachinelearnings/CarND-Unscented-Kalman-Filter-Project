@@ -269,8 +269,8 @@ void UKF::Prediction(double delta_t) {
     while (x_diff(3)<-M_PI) x_diff(3) += 2*M_PI;
     
     P_ += weights_(i) * x_diff * x_diff.transpose();
-    cout << "mean & covariance complete at 272 \n";
   }
+  cout << "mean & covariance complete at 272 \n";
 }
 
 /**
@@ -293,25 +293,26 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
   //mean predicted measurement
   VectorXd z_mean_pred = VectorXd(n_z);
   z_mean_pred.fill(0.0);
-  
   //measurement covariance matrix S
   MatrixXd S = MatrixXd(n_z,n_z);
   S.fill(0.0);
 
   //Measurement noise covariance matrix
   MatrixXd R = MatrixXd(3,3);
-  R << std_radr_*std_radr_, 0, 
-        0, std_radphi_*std_radphi_;  
-
+  R << std_laspx_*std_laspx_, 0,
+        0, std_laspy_*std_laspy_;
+  cout << "Zsig, Z_mean_pred S, R initiazed in lidar\n";
+  cout << "Xsig_Pred_ :: " << Xsig_pred_ << "\n">;
   //Zsig is for eventually calculating the predicted covariance in measurement space S
- double px, py;
  for(int i=0; i<2*n_aug_+1; i++) {
-     px = Xsig_pred_(0, i);
-     py = Xsig_pred_(1, i);
-     
-     Zsig(0, i) = px;
-     Zsig(1, i) = py;
+	 cout << "Inside loop with value i=" << i << "\n";
+	 cout << "Sig Pred px at column " << i << Xsig_pred_(0, i);
+	 cout << "Sig Pred py at column " << i << Xsig_pred_(0, i);
+     Zsig(0, i) = Xsig_pred_(0, i);
+     Zsig(1, i) = Xsig_pred_(1, i);
  }
+ cout << "Zsig :: " << Zsig << "\n">;
+
 
  cout << "Zsig done! \n";
 
@@ -381,7 +382,7 @@ for(int i=0; i<2*n_aug_+1; i++) {
  * @param {MeasurementPackage} meas_package
  */
 void UKF::UpdateRadar(MeasurementPackage meas_package) {
-	cout << "In LIDAR XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \n";
+	cout << "In RADAR XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \n";
   /**
   * In measurement space, the vecor dimension is 3 as radar provides 3 dimensions only
   * 
