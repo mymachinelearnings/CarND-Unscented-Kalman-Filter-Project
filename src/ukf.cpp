@@ -274,15 +274,96 @@ void UKF::Prediction(double delta_t) {
  * @param {MeasurementPackage} meas_package
  */
 void UKF::UpdateLidar(MeasurementPackage meas_package) {
-  /**
-  TODO:
+  /*****************************STEP 1 : TRANSFORMING PREDITECTED MEAN & COVARIANCE AT TIME k+1 TO MEASUREMENT SPACE****************************/
+  /*
+   * This step involves transforming the mean x [5] vector & covariance P [5 * 15] 
+   * into measurement space with mean z [3] vector & covariance S [3 * 21] matrix
+   */  
+  int n_z = 2;
 
-  Complete this function! Use lidar data to update the belief about the object's
-  position. Modify the state vector, x_, and covariance, P_.
+  //create matrix for sigma points in measurement space
+  MatrixXd Zsig = MatrixXd(n_z, 2 * n_aug_ + 1);
+  Zsig.fill(0.0);
 
-  You'll also need to calculate the lidar NIS.
-  */
+  //mean predicted measurement
+  VectorXd z_mean_pred = VectorXd(n_z);
+  z_mean_pred.fill(0.0);
+  
+  //measurement covariance matrix S
+  MatrixXd S = MatrixXd(n_z,n_z);
+  S.fill(0.0);
+
+  //Measurement noise covariance matrix
+  MatrixXd R = MatrixXd(3,3);
+  R << std_radr_*std_radr_, 0 
+        0, std_radphi_*std_radphi_;  
+
+  //Zsig is for eventually calculating the predicted covariance in measurement space S
+ double px, py;
+ for(int i=0; i<2*n_aug_+1; i++) {
+     px = Xsig_pred_(0, i);
+     py = Xsig_pred_(1, i);
+     
+     Zsig(0, i) = px;
+     Zsig(1, i) = py;
+ }
+
+
+//calculate mean predicted measurement
+for(int i=0; i<2*n_aug_+1; i++) {
+    z_mean_pred += weights_(i) * Zsig.col(i);
 }
+
+//calculate covariance matrix S
+
+for(int i=0; i<2*n_aug_+1; i++) {
+    VectorXd Z_diff = Zsig.col(i) - z_mean_pred;    
+    
+    S += weights_(i) * Z_diff * Z_diff.transpose();
+  }
+
+  S = S + R;
+
+
+  /*****************************STEP 2 : UPDATING THE BELIEF****************************/
+  /*
+   * This step involves 
+   * 
+   */  
+  //Getting actual measurement at time k+1
+  VectorXd z = VectorXd(n_z);
+  z << meas_package.raw_measurements_[0],
+       meas_package.raw_measurements_[1];
+
+
+  MatrixXd Tc = MatrixXd(n_x_, n_z);
+  Tc.fill(0.0);
+  
+  for (int i = 0; i < 2 * n_aug_ + 1; i++) {
+
+    //residual
+    VectorXd z_diff = Zsig.col(i) - z_mean_pred;
+
+    // state difference
+    VectorXd x_diff = Xsig_pred_.col(i) - x_;
+
+    Tc = Tc + weights_(i) * x_diff * z_diff.transpose();
+  }
+
+  //Kalman gain K;
+  MatrixXd K = Tc * S.inverse();
+
+  //residual
+  VectorXd z_diff = z - z_mean_pred;
+
+  //update state mean and covariance matrix
+  x_ = x_ + K * z_diff;
+  P_ = P_ - K*S*K.transpose();
+
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
 
 /**
  * Updates the state and the state covariance matrix using a radar measurement.
@@ -369,6 +450,7 @@ for(int i=0; i<2*n_aug_+1; i++) {
 
   MatrixXd Tc = MatrixXd(n_x_, n_z);
   Tc.fill(0.0);
+
   for (int i = 0; i < 2 * n_aug_ + 1; i++) {
 
     //residual
@@ -399,8 +481,4 @@ for(int i=0; i<2*n_aug_+1; i++) {
   //update state mean and covariance matrix
   x_ = x_ + K * z_diff;
   P_ = P_ - K*S*K.transpose();
-
-
-
-
 }
