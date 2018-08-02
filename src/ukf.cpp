@@ -302,7 +302,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
   R << std_laspx_*std_laspx_, 0,
         0, std_laspy_*std_laspy_;
   cout << "Zsig, Z_mean_pred S, R initiazed in lidar\n";
-  cout << "Xsig_Pred_ :: " << Xsig_pred_ << "\n">;
+  cout << "Xsig_Pred_ :: " << Xsig_pred_ << "\n";
   //Zsig is for eventually calculating the predicted covariance in measurement space S
  for(int i=0; i<2*n_aug_+1; i++) {
 	 cout << "Inside loop with value i=" << i << "\n";
@@ -311,7 +311,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
      Zsig(0, i) = Xsig_pred_(0, i);
      Zsig(1, i) = Xsig_pred_(1, i);
  }
- cout << "Zsig :: " << Zsig << "\n">;
+ cout << "Zsig :: " << Zsig << "\n";
 
 
  cout << "Zsig done! \n";
