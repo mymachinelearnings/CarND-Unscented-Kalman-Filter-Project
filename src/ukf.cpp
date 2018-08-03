@@ -102,8 +102,8 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 
       x_ << px_r, 
             py_r, 
-            v, 
             0.0, 
+            0.0,
             0.0;
     }
     
