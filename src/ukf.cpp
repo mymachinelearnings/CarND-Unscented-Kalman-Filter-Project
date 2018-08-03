@@ -102,8 +102,8 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 
       x_ << px_r, 
             py_r, 
+            v,
             0.0, 
-            0.0,
             0.0;
     }
     
@@ -117,7 +117,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 
   double delta_t = (meas_package.timestamp_ - time_us_) / 1000000.0;
   time_us_ = meas_package.timestamp_;
-
+  cout << "time diff :: " << delta_t;
   Prediction(delta_t);
 
   if (meas_package.sensor_type_ == MeasurementPackage::LASER) {
@@ -201,7 +201,7 @@ void UKF::Prediction(double delta_t) {
     //predicted state values
     double px_p, py_p;
 
-    //yawd = 0 ==> vechicle is driving in a straight line
+    //vechicle is driving in a straight line ==> yawd=0
     if (fabs(yawd) > 0.001) {
         px_p = p_x + v/yawd * ( sin (yaw + yawd*delta_t) - sin(yaw));
         py_p = p_y + v/yawd * ( cos(yaw) - cos(yaw+yawd*delta_t) );
@@ -210,9 +210,13 @@ void UKF::Prediction(double delta_t) {
         py_p = p_y + v*delta_t*sin(yaw);
     }
 
-    double v_p = v;
+    //CHG - making 3rd and 5th terms as 0
+
+    //double v_p = v;
+    double v_p = 0;
     double yaw_p = yaw + yawd*delta_t;
-    double yawd_p = yawd;
+    //double yawd_p = yawd;
+    double yawd_p = 0;
 
     //add noise
     px_p = px_p + 0.5*nu_a*delta_t*delta_t * cos(yaw);
@@ -253,11 +257,13 @@ void UKF::Prediction(double delta_t) {
   // Calculating Mean
   //VectorXd Xpred_mean = VectorXd(n_x_);
   //MatrixXd Ppred = MatrixXd(n_x_, n_x_);
+  x_.fill(0.0);
   for(int i=0; i<2*n_aug_+1; i++) {
     x_ += weights_(i) * Xsig_pred_.col(i);
   }
   
   //Calculating predicted state covariance matrix
+  P_.fill(0.0);
   for(int i=0; i<2*n_aug_+1; i++) {
     VectorXd x_diff = Xsig_pred_.col(i) - x_;
     
