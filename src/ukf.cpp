@@ -333,6 +333,7 @@ for(int i=0; i<2*n_aug_+1; i++) {
   z << meas_package.raw_measurements_[0],
        meas_package.raw_measurements_[1];
 
+  cout << "LIDAR Prediction vs Measurement\n" << z_mean_pred << "\n" << z << "\n";
 
   MatrixXd Tc = MatrixXd(n_x_, n_z);
   Tc.fill(0.0);
@@ -445,7 +446,7 @@ for(int i=0; i<2*n_aug_+1; i++) {
   z << meas_package.raw_measurements_[0],
        meas_package.raw_measurements_[1],
        meas_package.raw_measurements_[2];
-
+  cout << "RADAR Prediction vs Measurement\n" << z_mean_pred << "\n" << z << "\n";
 
   MatrixXd Tc = MatrixXd(n_x_, n_z);
   Tc.fill(0.0);
