@@ -290,10 +290,10 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
   Zsig.fill(0.0);
   //mean predicted measurement
   VectorXd z_mean_pred = VectorXd(n_z);
-  z_mean_pred.fill(0.0);
+
   //measurement covariance matrix S
   MatrixXd S = MatrixXd(n_z,n_z);
-  S.fill(0.0);
+
 
   //Measurement noise covariance matrix
   MatrixXd R = MatrixXd(2,2);
@@ -309,12 +309,13 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
 
 
 //calculate mean predicted measurement
+ z_mean_pred.fill(0.0);
 for(int i=0; i<2*n_aug_+1; i++) {
     z_mean_pred += weights_(i) * Zsig.col(i);
 }
 
 //calculate covariance matrix S
-
+S.fill(0.0);
 for(int i=0; i<2*n_aug_+1; i++) {
     VectorXd Z_diff = Zsig.col(i) - z_mean_pred;    
     
@@ -387,11 +388,11 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
 
   //mean predicted measurement
   VectorXd z_mean_pred = VectorXd(n_z);
-  z_mean_pred.fill(0.0);
   
+
   //measurement covariance matrix S
   MatrixXd S = MatrixXd(n_z,n_z);
-  S.fill(0.0);
+
 
   //Measurement noise covariance matrix
   MatrixXd R = MatrixXd(3,3);
@@ -416,12 +417,13 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
  }
 
 //calculate mean predicted measurement
+ z_mean_pred.fill(0.0);
 for(int i=0; i<2*n_aug_+1; i++) {
     z_mean_pred += weights_(i) * Zsig.col(i);
 }
 
 //calculate covariance matrix S
-
+S.fill(0.0);
 for(int i=0; i<2*n_aug_+1; i++) {
     VectorXd Z_diff = Zsig.col(i) - z_mean_pred;
     
