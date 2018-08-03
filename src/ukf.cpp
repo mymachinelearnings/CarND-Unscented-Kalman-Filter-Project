@@ -210,13 +210,11 @@ void UKF::Prediction(double delta_t) {
         py_p = p_y + v*delta_t*sin(yaw);
     }
 
-    //CHG - making 3rd and 5th terms as 0
 
-    //double v_p = v;
-    double v_p = 0;
+
+    double v_p = v;
     double yaw_p = yaw + yawd*delta_t;
-    //double yawd_p = yawd;
-    double yawd_p = 0;
+    double yawd_p = yawd;
 
     //add noise
     px_p = px_p + 0.5*nu_a*delta_t*delta_t * cos(yaw);
