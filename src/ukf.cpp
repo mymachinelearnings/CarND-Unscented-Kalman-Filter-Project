@@ -121,8 +121,8 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
   Prediction(delta_t);
 
   if (meas_package.sensor_type_ == MeasurementPackage::LASER) {
-    //UpdateLidar(meas_package);
-    //cout << "Lidar Update complete!\n";
+    UpdateLidar(meas_package);
+    cout << "Lidar Update complete!\n";
   }
   else if (meas_package.sensor_type_ == MeasurementPackage::RADAR) {
     UpdateRadar(meas_package);
@@ -211,18 +211,17 @@ void UKF::Prediction(double delta_t) {
     }
 
 
-
+    //v, yawd came from the original x_, dont confuse with 0 in the formula
     double v_p = v;
     double yaw_p = yaw + yawd*delta_t;
     double yawd_p = yawd;
 
     //add noise
-    px_p = px_p + 0.5*nu_a*delta_t*delta_t * cos(yaw);
-    py_p = py_p + 0.5*nu_a*delta_t*delta_t * sin(yaw);
-    v_p = v_p + nu_a*delta_t;
-
-    yaw_p = yaw_p + 0.5*nu_yawdd*delta_t*delta_t;
-    yawd_p = yawd_p + nu_yawdd*delta_t;
+    px_p   += 0.5*nu_a*delta_t*delta_t * cos(yaw);
+    py_p   += 0.5*nu_a*delta_t*delta_t * sin(yaw);
+    v_p    += nu_a*delta_t;
+    yaw_p  += 0.5*nu_yawdd*delta_t*delta_t;
+    yawd_p += nu_yawdd*delta_t;
 
     //write predicted sigma point into right column
     Xsig_pred_(0,i) = px_p;
