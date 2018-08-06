@@ -11,6 +11,10 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 class UKF {
+  void NormalizeAngle(double& angle);
+
+  double UpdateMeanAndCovariance(int n_z, VectorXd &z, MatrixXd &Zsig, MatrixXd &R);
+
 public:
 
   ///* initially set to false, set to true in first call of ProcessMeasurement
@@ -30,6 +34,12 @@ public:
 
   ///* predicted sigma points matrix
   MatrixXd Xsig_pred_;
+
+  // Measurement noise for radar
+  MatrixXd R_radar_;
+
+  // Measurement noise for Lidar
+  MatrixXd R_laser_;
 
   ///* time when the state is true, in us
   long long time_us_;
@@ -67,6 +77,9 @@ public:
   ///* Sigma point spreading parameter
   double lambda_;
 
+  double NIS_radar_;
+
+  double NIS_laser_;
 
   /**
    * Constructor
